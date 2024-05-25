@@ -13,6 +13,30 @@ app.use(cors());
 app.get("/", cors(), (req, res)=>{
 
 })
+app.get('/products', async (req, res) => {
+    try {
+        const products = await Product.find();
+        res.json(products);
+    } catch (error) {
+        console.error('Error fetching products:', error);
+        res.status(500).json({ message: 'Failed to fetch products.' });
+    }
+});
+
+app.get('/product/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const product = await Product.findById(id);
+        if (product) {
+            res.json(product);
+        } else {
+            res.status(404).json({ message: 'Product not found.' });
+        }
+    } catch (error) {
+        console.error('Error fetching product:', error);
+        res.status(500).json({ message: 'Failed to fetch product.' });
+    }
+});
 
 app.post("/", async(req, res)=>{
     const{email, password}=req.body

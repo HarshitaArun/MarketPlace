@@ -1,18 +1,26 @@
-const express = require("express")
-const collection = require("./mongo")
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+const bcrypt = require("bcrypt");
 const multer = require('multer');
 const Product = require('./productModel');
-const cors = require("cors")
+const User = require('./mongo'); 
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
+mongoose.connect('mongodb://localhost:27017/marketplace', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useCreateIndex: true,
+});
 
-app.get("/", cors(), (req, res)=>{
+app.get("/", cors(), (req, res) => {
+    res.send("Welcome to the API");
+});
 
-})
 app.get('/products', async (req, res) => {
     try {
         const products = await Product.find();
@@ -38,45 +46,44 @@ app.get('/product/:id', async (req, res) => {
     }
 });
 
-app.post("/", async(req, res)=>{
-    const{email, password}=req.body
+app.post("/login", async (req, res) => {
+    const { email, password } = req.body;
 
-    try{
-        const check = await collection.findOne({email:email})
-        if(check){
-            res.json("exist")
+    try {
+        const user = await User.findOne({ email });
+        if (user && await bcrypt.compare(bcrypt.encrypt(password), user.password)) {
+            res.json("exist");
+        } else {
+            res.json("not exist");
         }
-        else{
-            res.json("not exist")
-        }
+    } catch (e) {
+        console.error('Error during login:', e);
+        res.status(500).json({ message: 'An error occurred during login.' });
     }
-    catch(e){
-        res.json("not exist")
-    }
-})
+});
 
-app.post("/signup", async(req, res)=>{
-    const{email, password}=req.body
+app.post("/signup", async (req, res) => {
+    const { name, email, password, dob } = req.body;
 
-    const data ={
-        email: email, 
-        password: password
-    }
-
-    try{
-        const check = await collection.findOne({email:email})
-        if(check){
-            res.json("exist")
+    try {
+        const userExists = await User.findOne({ email });
+        if (userExists) {
+            res.json("exist");
+        } else {
+            const newUser = new User({
+                name,
+                email,
+                password,
+                dob: new Date(dob) 
+            });
+            await User.create(newUser);
+            res.json("not exist");
         }
-        else{
-            res.json("not exist")
-            await collection.create([data])
-        }
+    } catch (e) {
+        console.error('Error during signup:', e);
+        res.status(500).json({ message: 'An error occurred during signup.' });
     }
-    catch(e){
-        res.json("not exist")
-    }
-})
+});
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -112,7 +119,6 @@ app.post('/sellForm', upload.single('image'), async (req, res) => {
     }
 });
 
-app.listen(8000, ()=>{
-    console.log("port connected")
-})
-
+app.listen(8000, () => {
+    console.log("Server is running on port 8000");
+});

@@ -1,50 +1,89 @@
-import React, {useEffect, useState} from "react"
-import axios from "axios"
-import {useNavigate, Link} from "react-router-dom"
+import React, { useState } from "react";
+import axios from "axios";
+import { useNavigate, Link } from "react-router-dom";
+import './Style/Signup.css';  
 
 const Signup = () => {
-
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [dob, setDob] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
+    const [userExist, setUserExist] = useState('');
     const history = useNavigate();
-    async function submit(e){
+
+    async function submit(e) {
         e.preventDefault();
-        try{
-            await axios.post("http://localhost:8000/signup", {email, password})
-            .then(res =>{
-                if(res.data==="exist"){
-                   alert("user exists") 
-                }
-                else if(res.data==="not exist"){
-                    history("/home", {state:{id:email}})
-                }
-            })
-            .catch(e =>{
-                alert("incorrect username/passsword")
-                console.log(e)
-            })
+
+        if (password !== confirmPassword) {
+            setErrorMessage("Passwords do not match");
+            return;
         }
-        catch(e){
-            console.log(e)
+
+        try {
+            await axios.post("http://localhost:8000/signup", { name, email, password, dob })
+                .then(res => {
+                    if (res.data === "exist") {
+                        setUserExist("User already exists");
+                    } else if (res.data === "not exist") {
+                        history("/");
+                    }
+                })
+                .catch(e => {
+                    setErrorMessage("An error occurred");
+                    console.log(e);
+                });
+        } catch (e) {
+            console.log(e);
         }
     }
 
-    return(
+    return (
         <div className="signup">
-            <h1>Signup here</h1>
+            <h1>Register here</h1>
 
-            <form action="POST">
-                <input type="email" onChange={(e)=>{setEmail(e.target.value)}} placeholder="Your Email" name="" id=""/>
-                <input type="password" onChange={(e)=>{setPassword(e.target.value)}} placeholder="Your Password" name="" id=""/>
-                <input type="submit" onClick={submit}/>
+            <form onSubmit={submit}>
+                <input 
+                    type="text" 
+                    onChange={(e) => { setName(e.target.value) }} 
+                    placeholder="Your Name" 
+                    required 
+                />
+                <input 
+                    type="email" 
+                    onChange={(e) => { setEmail(e.target.value) }} 
+                    placeholder="Your Email" 
+                    required 
+                />
+                <input 
+                    type="password" 
+                    onChange={(e) => { setPassword(e.target.value) }} 
+                    placeholder="Your Password" 
+                    required 
+                />
+                <input 
+                    type="password" 
+                    onChange={(e) => { setConfirmPassword(e.target.value) }} 
+                    placeholder="Confirm Password" 
+                    required 
+                />
+                {errorMessage && <p style={{ color: 'black' }}>{errorMessage}</p>}
+                <input 
+                    type="date" 
+                    onChange={(e) => { setDob(e.target.value) }} 
+                    placeholder="Your Date of Birth" 
+                    required 
+                />
+                {userExist && <p style={{ color: 'red' }}>{userExist}</p>}
+                <input type="submit" value="Sign Up" />
             </form>
-            <br/>
-                <p>OR</p>
-            <br/>
-            <Link to = "/">Login Page</Link>
-
+            <br />
+            <p>OR</p>
+            <br />
+            <Link to="/">Login Page</Link>
         </div>
-    )
+    );
 }
 
-export default Signup
+export default Signup;

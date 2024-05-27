@@ -1,25 +1,31 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import './Style/BuyMain.css';  // Add this line to import the CSS
 
-const BuyMain = () => {
+const BuyMain = ({ currentUserEmail }) => {
     const [products, setProducts] = useState([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchProducts = async () => {
             try {
                 const response = await axios.get('http://localhost:8000/products');
-                setProducts(response.data);
+                setProducts(response.data.filter(product => product.userEmail !== currentUserEmail));
             } catch (error) {
                 console.error('Error fetching products:', error);
             }
         };
 
         fetchProducts();
-    }, []);
+    }, [currentUserEmail]);
 
     return (
         <div className="buy-main">
+            <header className="header">
+                <button onClick={() => navigate('/SellForm')}>Sell Here</button>
+                <button onClick={() => navigate('/messages')}>Check for Messages</button>
+            </header>
             <h1>Products</h1>
             <div className="product-grid">
                 {products.map(product => (

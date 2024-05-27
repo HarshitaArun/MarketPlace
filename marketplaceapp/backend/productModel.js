@@ -5,10 +5,10 @@ const productSchema = new mongoose.Schema({
     brandName: { type: String, required: true },
     condition: { type: String, required: true },
     initialPrice: { type: Number, required: true },
-    bidTime: { type: Number, required: true },
+    bidTime: { type: Number, required: true }, 
     image: { type: String, required: true },
-    userEmail: { type: String, required: true},
-});
+    userEmail: { type: String, required: true }
+}, { timestamps: true }); 
 
 const Product = mongoose.model('Product', productSchema);
 

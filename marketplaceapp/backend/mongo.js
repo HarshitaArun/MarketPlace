@@ -8,15 +8,24 @@ mongoose.connect("mongodb://localhost:27017/marketplace")
 })
 
 const userSchema = new mongoose.Schema({
-    email:{
-        type:String, 
-        required:true
-    }, 
-    password:{
-        type:String, 
-        required:true
+    name: {
+        type: String,
+        required: true
+    },
+    email: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    password: {
+        type: String,
+        required: true
+    },
+    dateOfBirth: {
+        type: Date,
+        required: true
     }
-})
+});
 
 const collection = mongoose.model("collection", userSchema)
 

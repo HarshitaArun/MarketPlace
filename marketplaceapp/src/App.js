@@ -4,6 +4,7 @@ import Signup from "./components/Signup"
 import BuyMain from "./components/BuyMain"
 import SellForm from "./components/SellForm"
 import BuyProduct from './components/BuyProduct';
+import Messages from "./components/Messages"
 
 import {BrowserRouter as Router, Routes, Route} from "react-router-dom"
 import {useState} from 'react'
@@ -19,6 +20,7 @@ function App(){
           <Route path="/buymain" element={<BuyMain />} />
           <Route path="/sellform" element={<SellForm />} />
           <Route path="/product/:id" element={<BuyProduct />} />
+          <Route path="/messages" element={<Messages/>}/>
 
         </Routes>
       </Router>

@@ -16,7 +16,7 @@ const Login = () => {
             await axios.post("http://localhost:8000/login", { email, password })
                 .then(res => {
                     if (res.data === "exist") {
-                        history("/home", { state: { id: email } });
+                        history("/buyMain", { state: { id: email } });
                     } else if (res.data === "not exist") {
                         setErrorMessage("Incorrect username/password");
                     }

@@ -1,40 +1,40 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import './Style/BuyMain.css';  // Add this line to import the CSS
+import { Link, useLocation } from 'react-router-dom';
+import './Style/BuyMain.css'; // Make sure this path is correct
 
-const BuyMain = ({ currentUserEmail }) => {
+const BuyMain = () => {
     const [products, setProducts] = useState([]);
-    const navigate = useNavigate();
+    const location = useLocation();
+    const userEmail = location.state?.userEmail;
 
     useEffect(() => {
         const fetchProducts = async () => {
             try {
                 const response = await axios.get('http://localhost:8000/products');
-                setProducts(response.data.filter(product => product.userEmail !== currentUserEmail));
+                setProducts(response.data);
             } catch (error) {
                 console.error('Error fetching products:', error);
             }
         };
 
         fetchProducts();
-    }, [currentUserEmail]);
+    }, []);
 
     return (
-        <div className="buy-main">
-            <header className="header">
-                <button onClick={() => navigate('/SellForm')}>Sell Here</button>
-                <button onClick={() => navigate('/messages')}>Check for Messages</button>
-            </header>
-            <h1>Products</h1>
+        <div className="buy-main-container">
+            <div className="top-dashboard">
+                <Link to={{ pathname: '/sellForm', state: { userEmail } }} className="dashboard-link">Sell Here</Link>
+                <Link to={{ pathname: '/messages', state: { userEmail } }} className="dashboard-link">Notifications</Link>
+            </div>
             <div className="product-grid">
                 {products.map(product => (
                     <div key={product._id} className="product-card">
                         <img src={`http://localhost:8000/uploads/${product.image}`} alt={product.productName} />
-                        <h2>{product.productName}</h2>
+                        <h3>{product.productName}</h3>
                         <p>${product.initialPrice}</p>
-                        <Link to={`/product/${product._id}`}>
-                            <button>View Product</button>
+                        <Link to={{ pathname: `/buyProduct/${product._id}`, state: { userEmail } }}>
+                            View Product
                         </Link>
                     </div>
                 ))}

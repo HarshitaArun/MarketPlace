@@ -7,7 +7,9 @@ const productSchema = new mongoose.Schema({
     initialPrice: { type: Number, required: true },
     bidTime: { type: Number, required: true }, 
     image: { type: String, required: true },
-    userEmail: { type: String, required: true }
+    userEmail: { type: String, required: true },
+    currentBid: { type: Number, required: true, default: function() { return this.initialPrice; } },
+    currentBidder: { type: String, default: null }
 }, { timestamps: true }); 
 
 const Product = mongoose.model('Product', productSchema);

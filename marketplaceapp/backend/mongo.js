@@ -20,11 +20,8 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true
-    },
-    dateOfBirth: {
-        type: Date,
-        required: true
     }
+    
 });
 
 const collection = mongoose.model("collection", userSchema)

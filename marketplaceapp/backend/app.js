@@ -46,6 +46,33 @@ app.get('/product/:id', async (req, res) => {
     }
 });
 
+app.post('/product/:id/bid', async (req, res) => {
+    const { id } = req.params;
+    const { bid, userEmail } = req.body;
+
+    try {
+        const product = await Product.findById(id);
+
+        if (!product) {
+            return res.status(404).json({ success: false, message: 'Product not found.' });
+        }
+
+        if (bid <= product.currentBid) {
+            return res.status(400).json({ success: false, message: 'Your bid must be higher than the current bid.' });
+        }
+
+        product.currentBid = bid;
+        product.currentBidder = userEmail;
+
+        await product.save();
+
+        res.json({ success: true, message: 'Bid placed successfully.' });
+    } catch (error) {
+        console.error('Error placing bid:', error);
+        res.status(500).json({ success: false, message: 'Failed to place bid.' });
+    }
+});
+
 app.post("/login", async (req, res) => {
     const { email, password } = req.body;
 
@@ -62,8 +89,9 @@ app.post("/login", async (req, res) => {
     }
 });
 
+
 app.post("/signup", async (req, res) => {
-    const { name, email, password, dob } = req.body;
+    const { name, email, password } = req.body;
 
     try {
         const userExists = await User.findOne({ email });
@@ -74,7 +102,7 @@ app.post("/signup", async (req, res) => {
                 name,
                 email,
                 password,
-                dob: new Date(dob) 
+        
             });
             await User.create(newUser);
             res.json("not exist");
@@ -109,6 +137,8 @@ app.post('/sellForm', upload.single('image'), async (req, res) => {
             bidTime,
             image,
             userEmail,
+            currentBid: initialPrice,
+            currentBidder: null       
         });
 
         await newProduct.save();
@@ -118,6 +148,7 @@ app.post('/sellForm', upload.single('image'), async (req, res) => {
         res.status(500).json({ message: 'Failed to list product.' });
     }
 });
+
 
 app.listen(8000, () => {
     console.log("Server is running on port 8000");
